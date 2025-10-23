@@ -13,8 +13,31 @@ const PORT = process.env.PORT || 5000;
 
 // Security middleware
 app.use(helmet());
+
+// Normalize CLIENT_URL so users can supply either 'example.com' or 'https://example.com'
+const rawClientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+const normalizeOrigin = (u) => {
+  if (!u) return u;
+  if (u.startsWith('http://') || u.startsWith('https://')) return u;
+  return `https://${u}`;
+};
+const clientOrigin = normalizeOrigin(rawClientUrl);
+
+// Allowlist common dev origins plus the configured client origin
+const allowedOrigins = new Set([
+  clientOrigin,
+  'http://localhost:5173',
+  'http://localhost:3000',
+]);
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: function (origin, callback) {
+    // Allow non-browser (e.g., server-to-server) requests with no origin
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.has(origin)) return callback(null, true);
+    // For debugging, include the offending origin in the error
+    return callback(new Error('CORS policy: origin not allowed - ' + origin));
+  },
   credentials: true
 }));
 
@@ -42,8 +65,9 @@ connectDB().then(() => {
 });
 
 // Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/favorites', favoriteRoutes);
+// Mount routes under both /api/* and /* to be tolerant of different client configs
+app.use(['/api/auth', '/auth'], authRoutes);
+app.use(['/api/favorites', '/favorites'], favoriteRoutes);
 
 // Serve frontend in production (single-deploy)
 if (process.env.NODE_ENV === 'production') {
@@ -63,12 +87,15 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
-  // Include database connection status in the health response
+// Health check handler (mounted under /api/health and /health for compatibility)
+const healthHandler = (req, res) => {
   const dbState = mongoose.connection.readyState; // 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
   const dbConnected = dbState === 1;
   res.json({ status: 'OK', message: 'Pokedex API is running!', dbConnected });
-});
+};
+
+app.get('/api/health', healthHandler);
+app.get('/health', healthHandler);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

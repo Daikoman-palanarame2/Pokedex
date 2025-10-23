@@ -220,7 +220,7 @@ This guide uses the following free-tier services:
 
 1. Sign up at https://www.mongodb.com/cloud/atlas and create a free shared cluster (M0).
 2. Create a database user (username and password).
-3. In "Network Access" allow your app IPs or 0.0.0.0/0 for testing (less secure).
+3. In "Network Access" allow only the IP addresses that need access. For temporary testing you may allow 0.0.0.0/0, but this is less secure and should never be used in production.
 4. Get the connection string and replace <username>, <password>, and <dbname>.
    Example:
 
@@ -436,5 +436,3 @@ curl http://localhost:5000/api/health
 - Team builder
 
 ---
-
-**Happy Pokemon hunting! 🎮**
