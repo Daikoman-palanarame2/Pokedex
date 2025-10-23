@@ -14,6 +14,7 @@ const Gallery = () => {
   const [selectedType, setSelectedType] = useState('');
   const [types, setTypes] = useState([]);
   const [filteredPokemon, setFilteredPokemon] = useState([]);
+  const [typePokemonList, setTypePokemonList] = useState([]); // when a type is selected, store full list
   const { user, updateUser } = useAuth();
 
   const POKEMON_PER_PAGE = 20;
@@ -25,7 +26,9 @@ const Gallery = () => {
 
   useEffect(() => {
     if (selectedType) {
-      loadPokemonByType(selectedType);
+      // Reset to first page when type filter changes
+      setCurrentPage(0);
+      loadPokemonByType(selectedType, 0);
     } else {
       loadPokemon();
     }
@@ -62,21 +65,29 @@ const Gallery = () => {
     }
   };
 
-  const loadPokemonByType = async (typeName) => {
+  const loadPokemonByType = async (typeName, offset = 0) => {
     try {
       setLoading(true);
       const response = await pokemonApi.getPokemonByType(typeName);
-      
-      // Get detailed Pokemon data
-      const pokemonPromises = response.pokemon.slice(0, 20).map(async (pokemonEntry) => {
-        const pokemonData = await pokemonApi.getPokemon(pokemonEntry.pokemon.name);
+
+      // response.pokemon is an array of { pokemon: { name, url }, slot }
+      const allPokemonOfType = response.pokemon.map(p => p.pokemon);
+      setTypePokemonList(allPokemonOfType);
+
+      // Compute pagination
+      const start = offset;
+      const slice = allPokemonOfType.slice(start, start + POKEMON_PER_PAGE);
+
+      // Fetch detailed Pokemon data for the current page slice
+      const pokemonPromises = slice.map(async (pokemonEntry) => {
+        const pokemonData = await pokemonApi.getPokemon(pokemonEntry.name);
         return pokemonData;
       });
-      
+
       const pokemonData = await Promise.all(pokemonPromises);
       setPokemon(pokemonData);
       setFilteredPokemon(pokemonData);
-      setTotalPages(1);
+      setTotalPages(Math.ceil(allPokemonOfType.length / POKEMON_PER_PAGE));
     } catch (error) {
       console.error('Error loading Pokemon by type:', error);
     } finally {
@@ -88,7 +99,13 @@ const Gallery = () => {
     if (newPage >= 0 && newPage < totalPages) {
       setCurrentPage(newPage);
       const offset = newPage * POKEMON_PER_PAGE;
-      loadPokemon(offset);
+
+      if (selectedType) {
+        // When a type is selected, load the corresponding slice from the type list
+        loadPokemonByType(selectedType, offset);
+      } else {
+        loadPokemon(offset);
+      }
     }
   };
 
