@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Search, Star, Users, Zap } from 'lucide-react';
 import { pokemonApi, getPokemonImage, formatPokemonName, formatPokemonId, favoritesApi } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import PokemonCard from '../components/PokemonCard';
 import Loader from '../components/Loader';
 
@@ -12,7 +13,8 @@ const Home = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchLoading, setSearchLoading] = useState(false);
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadFeaturedPokemon();
@@ -50,6 +52,11 @@ const Home = () => {
   };
 
   const handleAddToFavorites = async (pokemon) => {
+    // Redirect unauthenticated users to login
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
     try {
       // Optimistic update: mark as favorite immediately
       let rollback = null;
@@ -83,6 +90,11 @@ const Home = () => {
   };
 
   const handleAddToTeam = async (pokemon) => {
+    // Redirect unauthenticated users to login
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
     try {
       // Optimistic update for team
       let rollback = null;

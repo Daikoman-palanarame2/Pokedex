@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Heart, Users, Trash2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { favoritesApi, getPokemonImage } from '../utils/api';
 import PokemonCard from '../components/PokemonCard';
 import Loader from '../components/Loader';
 
 const Favorites = () => {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [favorites, setFavorites] = useState([]);
   const [team, setTeam] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -94,6 +96,10 @@ const Favorites = () => {
   };
 
   const handleAddToFavorites = async (pokemon) => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
     try {
       await favoritesApi.addToFavorites({
         pokemonId: pokemon.id,
@@ -119,6 +125,10 @@ const Favorites = () => {
   };
 
   const handleAddToTeam = async (pokemon) => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
     try {
       await favoritesApi.addToTeam({
         pokemonId: pokemon.id,

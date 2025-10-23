@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Filter } from 'lucide-react';
 import { pokemonApi, getPokemonImage, favoritesApi } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import PokemonCard from '../components/PokemonCard';
 import Loader from '../components/Loader';
 
@@ -15,7 +16,8 @@ const Gallery = () => {
   const [types, setTypes] = useState([]);
   const [filteredPokemon, setFilteredPokemon] = useState([]);
   const [typePokemonList, setTypePokemonList] = useState([]); // when a type is selected, store full list
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   const POKEMON_PER_PAGE = 20;
 
@@ -115,6 +117,10 @@ const Gallery = () => {
   };
 
   const handleAddToFavorites = async (pokemon) => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
     try {
       let rollback = null;
       if (user) {
@@ -145,6 +151,10 @@ const Gallery = () => {
   };
 
   const handleAddToTeam = async (pokemon) => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
     try {
       let rollback = null;
       if (user) {
