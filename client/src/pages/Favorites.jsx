@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import { Heart, Users, Trash2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { favoritesApi, getPokemonImage } from '../utils/api';
+import { favoritesApi, getPokemonImage, pokemonApi } from '../utils/api';
+import { useToast } from '../context/ToastContext';
 import PokemonCard from '../components/PokemonCard';
 import Loader from '../components/Loader';
 
