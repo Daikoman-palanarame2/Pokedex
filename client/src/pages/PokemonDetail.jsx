@@ -5,10 +5,14 @@ import { ArrowLeft, Heart, Users, Zap, Shield, Swords } from 'lucide-react';
 import { pokemonApi, getPokemonImage, formatPokemonName, formatPokemonId, getTypeColor, favoritesApi } from '../utils/api';
 import PokemonStats from '../components/PokemonStats';
 import Loader from '../components/Loader';
+import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 
 const PokemonDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const { showToast } = useToast();
   const [pokemon, setPokemon] = useState(null);
   const [species, setSpecies] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -37,6 +41,11 @@ const PokemonDetail = () => {
   };
 
   const handleAddToFavorites = async () => {
+    if (!isAuthenticated) {
+      showToast('Please login to save favorites', { duration: 1200 });
+      setTimeout(() => navigate('/login'), 800);
+      return;
+    }
     try {
       if (isFavorite) {
         await favoritesApi.removeFromFavorites(pokemon.id);
@@ -55,6 +64,11 @@ const PokemonDetail = () => {
   };
 
   const handleAddToTeam = async () => {
+    if (!isAuthenticated) {
+      showToast('Please login to add team members', { duration: 1200 });
+      setTimeout(() => navigate('/login'), 800);
+      return;
+    }
     try {
       if (isInTeam) {
         await favoritesApi.removeFromTeam(pokemon.id);
