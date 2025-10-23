@@ -202,14 +202,21 @@ const Gallery = () => {
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredPokemon.map((pokemon) => (
-              <PokemonCard
-                key={pokemon.id}
-                pokemon={pokemon}
-                onAddToFavorites={handleAddToFavorites}
-                onAddToTeam={handleAddToTeam}
-              />
-            ))}
+            {filteredPokemon.map((pokemon) => {
+              const isFavorite = user && user.favorites && user.favorites.some(f => String(f.pokemonId) === String(pokemon.id));
+              const isInTeam = user && user.team && user.team.some(t => String(t.pokemonId) === String(pokemon.id));
+
+              return (
+                <PokemonCard
+                  key={pokemon.id}
+                  pokemon={pokemon}
+                  onAddToFavorites={handleAddToFavorites}
+                  onAddToTeam={handleAddToTeam}
+                  isFavorite={isFavorite}
+                  isInTeam={isInTeam}
+                />
+              );
+            })}
           </div>
 
           {/* Pagination */}

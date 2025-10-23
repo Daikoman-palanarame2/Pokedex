@@ -98,6 +98,16 @@ const Home = () => {
     }
   };
 
+  const isPokemonFavorite = (pokemon) => {
+    if (!user || !user.favorites) return false;
+    return user.favorites.some(f => String(f.pokemonId) === String(pokemon.id));
+  };
+
+  const isPokemonInTeam = (pokemon) => {
+    if (!user || !user.team) return false;
+    return user.team.some(t => String(t.pokemonId) === String(pokemon.id));
+  };
+
   return (
     <div className="space-y-12">
       {/* Hero Section */}
@@ -148,6 +158,8 @@ const Home = () => {
                 pokemon={pokemon}
                 onAddToFavorites={handleAddToFavorites}
                 onAddToTeam={handleAddToTeam}
+                isFavorite={isPokemonFavorite(pokemon)}
+                isInTeam={isPokemonInTeam(pokemon)}
               />
             ))}
           </div>
@@ -228,6 +240,8 @@ const Home = () => {
                 pokemon={pokemon}
                 onAddToFavorites={handleAddToFavorites}
                 onAddToTeam={handleAddToTeam}
+                isFavorite={isPokemonFavorite(pokemon)}
+                isInTeam={isPokemonInTeam(pokemon)}
               />
             ))}
           </div>
