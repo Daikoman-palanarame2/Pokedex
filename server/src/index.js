@@ -35,6 +35,25 @@ app.use(cors({
     // Allow non-browser (e.g., server-to-server) requests with no origin
     if (!origin) return callback(null, true);
     if (allowedOrigins.has(origin)) return callback(null, true);
+
+    // Fallback: allow matching by hostname (helps when protocol is omitted or different)
+    try {
+      const originHost = new URL(origin).hostname;
+      let clientHost = '';
+      try {
+        clientHost = new URL(clientOrigin).hostname;
+      } catch (e) {
+        // If clientOrigin isn't a full URL for some reason, strip protocol
+        clientHost = clientOrigin.replace(/^https?:\/\//, '');
+      }
+
+      if (originHost === clientHost) return callback(null, true);
+      // Allow localhost for dev tools and previews
+      if (originHost === 'localhost' || originHost === '127.0.0.1') return callback(null, true);
+    } catch (e) {
+      // fall through to error
+    }
+
     // For debugging, include the offending origin in the error
     return callback(new Error('CORS policy: origin not allowed - ' + origin));
   },
