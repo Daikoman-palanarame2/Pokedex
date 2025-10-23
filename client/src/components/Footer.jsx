@@ -31,10 +31,13 @@ const Footer = () => {
                 href="https://www.facebook.com/PerSyMonn"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Facebook"
                 className="text-gray-300 hover:text-white transition-colors"
               >
-                {/* Using Github icon as placeholder for Facebook from lucide-react; you can swap to a Facebook icon if available */}
-                <Github className="w-5 h-5" />
+                {/* Inline Facebook SVG (simple, no extra dependency) */}
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                  <path d="M22 12.07C22 6.48 17.52 2 11.93 2S2 6.48 2 12.07c0 4.84 3.44 8.85 8 9.74v-6.89H7.9v-2.85h2.11V9.41c0-2.09 1.25-3.25 3.14-3.25.91 0 1.86.16 1.86.16v2.05h-1.05c-1.03 0-1.35.64-1.35 1.29v1.56h2.3l-.37 2.85h-1.93V21.8c4.56-.89 8-4.9 8-9.73z"/>
+                </svg>
               </a>
             </div>
           </div>
@@ -104,7 +107,7 @@ const Footer = () => {
             Made with <Heart className="inline w-4 h-4 text-pokemon-red" /> using React, Express, and PokeAPI
           </p>
           <p className="text-gray-400 text-sm mt-2">
-            © 2024 Pokedex. All Pokemon data is property of Nintendo/Game Freak.
+            © 2025 Pokedex. All Pokemon data is property of Nintendo/Game Freak.
           </p>
         </div>
       </div>
