@@ -20,26 +20,21 @@ const Footer = () => {
             </p>
             <div className="flex space-x-4">
               <a 
-                href="https://github.com" 
+                href="https://github.com/Daikoman-palanarame2/Pokedex" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-gray-300 hover:text-white transition-colors"
               >
                 <Github className="w-5 h-5" />
               </a>
-              <a 
-                href="https://twitter.com" 
-                target="_blank" 
+              <a
+                href="https://www.facebook.com/PerSyMonn"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-300 hover:text-white transition-colors"
               >
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a 
-                href="mailto:contact@pokemonportfolio.com" 
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                <Mail className="w-5 h-5" />
+                {/* Using Github icon as placeholder for Facebook from lucide-react; you can swap to a Facebook icon if available */}
+                <Github className="w-5 h-5" />
               </a>
             </div>
           </div>
