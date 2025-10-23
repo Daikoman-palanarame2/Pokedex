@@ -51,13 +51,8 @@ const Home = () => {
 
   const handleAddToFavorites = async (pokemon) => {
     try {
-      await favoritesApi.addToFavorites({
-        pokemonId: pokemon.id,
-        pokemonName: pokemon.name,
-        pokemonImage: getPokemonImage(pokemon.id)
-      });
-
-      // Update local user context if available
+      // Optimistic update: mark as favorite immediately
+      let rollback = null;
       if (user) {
         const updatedUser = { ...user };
         updatedUser.favorites = updatedUser.favorites || [];
@@ -67,21 +62,30 @@ const Home = () => {
           pokemonImage: getPokemonImage(pokemon.id),
           addedAt: new Date()
         });
+        // Save previous state for rollback
+        const previousUser = { ...user };
+        rollback = () => updateUser(previousUser);
         updateUser(updatedUser);
       }
-    } catch (error) {
-      console.error('Add to favorites failed:', error);
-    }
-  };
 
-  const handleAddToTeam = async (pokemon) => {
-    try {
-      await favoritesApi.addToTeam({
+      await favoritesApi.addToFavorites({
         pokemonId: pokemon.id,
         pokemonName: pokemon.name,
         pokemonImage: getPokemonImage(pokemon.id)
       });
 
+      rollback = null; // success, no rollback needed
+    } catch (error) {
+      console.error('Add to favorites failed:', error);
+      // Rollback optimistic update on failure
+      if (typeof rollback === 'function') rollback();
+    }
+  };
+
+  const handleAddToTeam = async (pokemon) => {
+    try {
+      // Optimistic update for team
+      let rollback = null;
       if (user) {
         const updatedUser = { ...user };
         updatedUser.team = updatedUser.team || [];
@@ -91,10 +95,21 @@ const Home = () => {
           pokemonImage: getPokemonImage(pokemon.id),
           addedAt: new Date()
         });
+        const previousUser = { ...user };
+        rollback = () => updateUser(previousUser);
         updateUser(updatedUser);
       }
+
+      await favoritesApi.addToTeam({
+        pokemonId: pokemon.id,
+        pokemonName: pokemon.name,
+        pokemonImage: getPokemonImage(pokemon.id)
+      });
+
+      rollback = null;
     } catch (error) {
       console.error('Add to team failed:', error);
+      if (typeof rollback === 'function') rollback();
     }
   };
 

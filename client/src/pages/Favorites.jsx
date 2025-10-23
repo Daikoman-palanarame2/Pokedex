@@ -22,7 +22,21 @@ const Favorites = () => {
     try {
       setLoading(true);
       const response = await favoritesApi.getFavorites();
-      setFavorites(response.favorites);
+      const favs = response.favorites || [];
+
+      // Fetch full Pokemon details for each favorite to show types/images
+      const detailedPromises = favs.map(async (fav) => {
+        try {
+          const data = await pokemonApi.getPokemon(fav.pokemonId);
+          return { ...fav, details: data };
+        } catch (err) {
+          // If PokéAPI fails, return minimal structure
+          return { ...fav, details: null };
+        }
+      });
+
+      const detailedFavorites = await Promise.all(detailedPromises);
+      setFavorites(detailedFavorites);
     } catch (error) {
       console.error('Error loading favorites:', error);
     } finally {
@@ -33,7 +47,19 @@ const Favorites = () => {
   const loadTeam = async () => {
     try {
       const response = await favoritesApi.getTeam();
-      setTeam(response.team);
+      const teamMembers = response.team || [];
+
+      const detailedPromises = teamMembers.map(async (member) => {
+        try {
+          const data = await pokemonApi.getPokemon(member.pokemonId);
+          return { ...member, details: data };
+        } catch (err) {
+          return { ...member, details: null };
+        }
+      });
+
+      const detailedTeam = await Promise.all(detailedPromises);
+      setTeam(detailedTeam);
     } catch (error) {
       console.error('Error loading team:', error);
     }
@@ -186,11 +212,11 @@ const Favorites = () => {
               {favorites.map((favorite) => (
                 <div key={favorite.pokemonId} className="relative">
                   <PokemonCard
-                    pokemon={{
-                      id: favorite.pokemonId,
-                      name: favorite.pokemonName,
-                      types: [{ type: { name: 'normal' } }] // This would need to be fetched
-                    }}
+                    pokemon={
+                      favorite.details
+                        ? favorite.details
+                        : { id: favorite.pokemonId, name: favorite.pokemonName, types: [{ type: { name: 'normal' } }] }
+                    }
                     onAddToFavorites={handleAddToFavorites}
                     onAddToTeam={handleAddToTeam}
                     isFavorite={true}
@@ -232,11 +258,11 @@ const Favorites = () => {
               {team.map((member) => (
                 <div key={member.pokemonId} className="relative">
                   <PokemonCard
-                    pokemon={{
-                      id: member.pokemonId,
-                      name: member.pokemonName,
-                      types: [{ type: { name: 'normal' } }] // This would need to be fetched
-                    }}
+                    pokemon={
+                      member.details
+                        ? member.details
+                        : { id: member.pokemonId, name: member.pokemonName, types: [{ type: { name: 'normal' } }] }
+                    }
                     onAddToFavorites={handleAddToFavorites}
                     onAddToTeam={handleAddToTeam}
                     isFavorite={false}

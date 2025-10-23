@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Users } from 'lucide-react';
 import { getPokemonImage, formatPokemonName, formatPokemonId, getTypeColor } from '../utils/api';
 
@@ -53,7 +53,14 @@ const PokemonCard = ({ pokemon, onAddToFavorites, onAddToTeam, isFavorite, isInT
               } shadow-lg`}
               title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
             >
-              <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
+              <motion.span
+                initial={{ scale: 1 }}
+                animate={isFavorite ? { scale: 1.15 } : { scale: 1 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                className="inline-flex"
+              >
+                <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
+              </motion.span>
             </button>
             
             <button
@@ -65,7 +72,14 @@ const PokemonCard = ({ pokemon, onAddToFavorites, onAddToTeam, isFavorite, isInT
               } shadow-lg`}
               title={isInTeam ? 'Remove from team' : 'Add to team'}
             >
-              <Users className={`w-4 h-4 ${isInTeam ? 'fill-current' : ''}`} />
+              <motion.span
+                initial={{ scale: 1 }}
+                animate={isInTeam ? { scale: 1.15 } : { scale: 1 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                className="inline-flex"
+              >
+                <Users className={`w-4 h-4 ${isInTeam ? 'fill-current' : ''}`} />
+              </motion.span>
             </button>
           </div>
         </div>

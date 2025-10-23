@@ -99,12 +99,7 @@ const Gallery = () => {
 
   const handleAddToFavorites = async (pokemon) => {
     try {
-      await favoritesApi.addToFavorites({
-        pokemonId: pokemon.id,
-        pokemonName: pokemon.name,
-        pokemonImage: getPokemonImage(pokemon.id)
-      });
-
+      let rollback = null;
       if (user) {
         const updatedUser = { ...user };
         updatedUser.favorites = updatedUser.favorites || [];
@@ -114,21 +109,27 @@ const Gallery = () => {
           pokemonImage: getPokemonImage(pokemon.id),
           addedAt: new Date()
         });
+        const previousUser = { ...user };
+        rollback = () => updateUser(previousUser);
         updateUser(updatedUser);
       }
-    } catch (error) {
-      console.error('Add to favorites failed:', error);
-    }
-  };
 
-  const handleAddToTeam = async (pokemon) => {
-    try {
-      await favoritesApi.addToTeam({
+      await favoritesApi.addToFavorites({
         pokemonId: pokemon.id,
         pokemonName: pokemon.name,
         pokemonImage: getPokemonImage(pokemon.id)
       });
 
+      rollback = null;
+    } catch (error) {
+      console.error('Add to favorites failed:', error);
+      if (typeof rollback === 'function') rollback();
+    }
+  };
+
+  const handleAddToTeam = async (pokemon) => {
+    try {
+      let rollback = null;
       if (user) {
         const updatedUser = { ...user };
         updatedUser.team = updatedUser.team || [];
@@ -138,10 +139,21 @@ const Gallery = () => {
           pokemonImage: getPokemonImage(pokemon.id),
           addedAt: new Date()
         });
+        const previousUser = { ...user };
+        rollback = () => updateUser(previousUser);
         updateUser(updatedUser);
       }
+
+      await favoritesApi.addToTeam({
+        pokemonId: pokemon.id,
+        pokemonName: pokemon.name,
+        pokemonImage: getPokemonImage(pokemon.id)
+      });
+
+      rollback = null;
     } catch (error) {
       console.error('Add to team failed:', error);
+      if (typeof rollback === 'function') rollback();
     }
   };
 
