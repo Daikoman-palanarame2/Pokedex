@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Filter } from 'lucide-react';
 import { pokemonApi, getPokemonImage, favoritesApi } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '../context/ToastContext';
 import PokemonCard from '../components/PokemonCard';
 import Loader from '../components/Loader';
 
@@ -18,6 +19,7 @@ const Gallery = () => {
   const [typePokemonList, setTypePokemonList] = useState([]); // when a type is selected, store full list
   const { user, updateUser, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const POKEMON_PER_PAGE = 20;
 
@@ -118,7 +120,8 @@ const Gallery = () => {
 
   const handleAddToFavorites = async (pokemon) => {
     if (!isAuthenticated) {
-      navigate('/login');
+      showToast('Please login to save favorites', { duration: 1200 });
+      setTimeout(() => navigate('/login'), 800);
       return;
     }
     try {
@@ -152,7 +155,8 @@ const Gallery = () => {
 
   const handleAddToTeam = async (pokemon) => {
     if (!isAuthenticated) {
-      navigate('/login');
+      showToast('Please login to add team members', { duration: 1200 });
+      setTimeout(() => navigate('/login'), 800);
       return;
     }
     try {

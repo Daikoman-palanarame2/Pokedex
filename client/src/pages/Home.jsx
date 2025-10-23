@@ -4,6 +4,7 @@ import { Search, Star, Users, Zap } from 'lucide-react';
 import { pokemonApi, getPokemonImage, formatPokemonName, formatPokemonId, favoritesApi } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '../context/ToastContext';
 import PokemonCard from '../components/PokemonCard';
 import Loader from '../components/Loader';
 
@@ -15,6 +16,7 @@ const Home = () => {
   const [searchLoading, setSearchLoading] = useState(false);
   const { user, updateUser, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   useEffect(() => {
     loadFeaturedPokemon();
@@ -54,7 +56,8 @@ const Home = () => {
   const handleAddToFavorites = async (pokemon) => {
     // Redirect unauthenticated users to login
     if (!isAuthenticated) {
-      navigate('/login');
+      showToast('Please login to save favorites', { duration: 1200 });
+      setTimeout(() => navigate('/login'), 800);
       return;
     }
     try {
@@ -92,7 +95,8 @@ const Home = () => {
   const handleAddToTeam = async (pokemon) => {
     // Redirect unauthenticated users to login
     if (!isAuthenticated) {
-      navigate('/login');
+      showToast('Please login to add team members', { duration: 1200 });
+      setTimeout(() => navigate('/login'), 800);
       return;
     }
     try {

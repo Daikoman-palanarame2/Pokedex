@@ -9,7 +9,8 @@ import Loader from '../components/Loader';
 
 const Favorites = () => {
   const { user, updateUser, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
+    const navigate = useNavigate();
+    const { showToast } = useToast();
   const [favorites, setFavorites] = useState([]);
   const [team, setTeam] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -97,7 +98,8 @@ const Favorites = () => {
 
   const handleAddToFavorites = async (pokemon) => {
     if (!isAuthenticated) {
-      navigate('/login');
+      showToast('Please login to save favorites', { duration: 1200 });
+      setTimeout(() => navigate('/login'), 800);
       return;
     }
     try {
@@ -126,7 +128,8 @@ const Favorites = () => {
 
   const handleAddToTeam = async (pokemon) => {
     if (!isAuthenticated) {
-      navigate('/login');
+      showToast('Please login to add team members', { duration: 1200 });
+      setTimeout(() => navigate('/login'), 800);
       return;
     }
     try {
