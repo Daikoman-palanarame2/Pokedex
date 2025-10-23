@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/index.js",
     "start:prod": "NODE_ENV=production node src/index.js",
-    "postinstall": "echo Building client... && cd ../client && npm install --no-audit --no-fund && npm run build && cd -",
+  "postinstall": "echo Building client... && npm --prefix ../client install --no-audit --no-fund && npm --prefix ../client run build",
     "dev": "nodemon src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
